@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Scheduler,
   WeekView,
@@ -13,28 +13,51 @@ import {
 } from '@devexpress/dx-react-scheduler-material-ui';
 import { Paper } from '@mui/material';
 import { ViewState, EditingState, IntegratedEditing } from '@devexpress/dx-react-scheduler';
+import { db } from './firebase';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
 const currentDate = new Date();
-const schedulerData = [];
 
 const App = () => {
-  const [data, setData] = useState(schedulerData);
+  const [data, setData] = useState([]);
 
-  const commitChanges = ({ added, changed, deleted }) => {
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const querySnapshot = await getDocs(collection(db, "appointments"));
+      const appointments = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setData(appointments);
+    };
+
+    fetchData();
+  }, []);
+
+  const commitChanges = async ({ added, changed, deleted }) => {
     let newData = [...data];
 
     if (added) {
-      const startingAddedId = newData.length > 0 ? newData[newData.length - 1].id + 1 : 0;
-      newData = [...newData, { id: startingAddedId, ...added }];
+      const docRef = await addDoc(collection(db, "appointments"), added);
+      newData = [...newData, { id: docRef.id, ...added }];
     }
     if (changed) {
-      newData = newData.map(appointment => (
-        changed[appointment.id] ? { ...appointment, ...changed[appointment.id] } : appointment
-      ));
+      const updatePromises = Object.keys(changed).map(async (id) => {
+        const appointmentRef = doc(db, "appointments", id);
+        await updateDoc(appointmentRef, changed[id]);
+        newData = newData.map(appointment => (
+          appointment.id === id ? { ...appointment, ...changed[id] } : appointment
+        ));
+      });
+      await Promise.all(updatePromises);
     }
     if (deleted !== undefined) {
+      const appointmentRef = doc(db, "appointments", deleted);
+      await deleteDoc(appointmentRef);
       newData = newData.filter(appointment => appointment.id !== deleted);
     }
+
     setData(newData);
   };
 

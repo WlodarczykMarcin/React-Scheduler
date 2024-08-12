@@ -2,6 +2,7 @@
   "dependencies": {
     "@devexpress/dx-react-core": "^4.0.8",
     "@devexpress/dx-react-scheduler": "^4.0.8",
-    "@devexpress/dx-react-scheduler-material-ui": "^4.0.8"
+    "@devexpress/dx-react-scheduler-material-ui": "^4.0.8",
+    "firebase": "^10.12.5"
   }
 }
