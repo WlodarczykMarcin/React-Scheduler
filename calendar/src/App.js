@@ -16,6 +16,7 @@ import { ViewState, EditingState, IntegratedEditing } from '@devexpress/dx-react
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
+
 const currentDate = new Date();
 
 const App = () => {

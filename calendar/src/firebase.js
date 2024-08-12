@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
+// Konfiguracja Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC2VOHJ6JTtuwDD1UYVELb7N6ack5d8i8Y",
   authDomain: "react-b11e9.firebaseapp.com",
@@ -11,6 +13,11 @@ const firebaseConfig = {
   measurementId: "G-3NX0ETLXQP"
 };
 
-
 const app = initializeApp(firebaseConfig);
+
+
+const db = getFirestore(app);
+
 const analytics = getAnalytics(app);
+
+export { db };
